@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Багш нарын нэг өдөр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --accent: #3b6cf0;
+  --on-accent: #ffffff;
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #1b2130;
+  --muted: #667085;
+  --line: #e2e7f0;
+  --good: #1f9d63;
+  --bad: #e5484d;
+  --radius: 18px;
+  --rs: 11px;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--card));
+  --accent-line: color-mix(in srgb, var(--accent) 40%, var(--card));
+  --shadow: 0 1px 2px rgba(20,30,60,.05), 0 6px 20px rgba(20,30,60,.05);
+  --sans: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "Fira Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f131b; --card: #171c27; --ink: #edf0f6; --muted: #9aa4b6; --line: #28303f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f131b; --card: #171c27; --ink: #edf0f6; --muted: #9aa4b6; --line: #28303f;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+}
+:root[data-radius="sharp"] { --radius: 6px; --rs: 4px; }
+:root[data-anim="off"] *, :root[data-anim="off"] *::before, :root[data-anim="off"] *::after {
+  animation: none !important; transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.6; overflow-x: hidden; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent-line); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+
+/* ---------- top bar ---------- */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 3.7rem; }
+.brand { font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: .6rem; background: none; border: 0; padding: 0; }
+.brand i { width: 1.9rem; height: 1.9rem; border-radius: 9px; background: var(--accent); display: grid; place-items: center; color: var(--on-accent); font-style: normal; font-family: var(--mono); font-size: .8rem; font-weight: 500; }
+.btn { border: 1.5px solid var(--line); background: var(--card); padding: .55rem 1rem; border-radius: var(--rs); font-weight: 700; font-size: .92rem; transition: border-color .15s, transform .15s, background .15s; }
+.btn:hover { border-color: var(--accent); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.small { padding: .35rem .7rem; font-size: .82rem; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* ---------- home ---------- */
+.hero { padding: 4.2rem 0 2.4rem; }
+.hero h1 { font-size: clamp(2.3rem, 6.5vw, 4rem); line-height: 1.08; font-weight: 800; letter-spacing: -.02em; max-width: 14ch; }
+.hero p { margin-top: 1rem; color: var(--muted); font-size: 1.12rem; max-width: 36ch; }
+.teacher { display: inline-flex; margin-top: 1.2rem; padding: .3rem .8rem; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: .9rem; }
+:root[data-theme="dark"] .teacher, :root:not([data-theme="light"]) .teacher { }
+.teacher:empty { display: none; }
+
+.gradeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding-bottom: 4rem; }
+.gradeCard { text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow); transition: transform .2s, border-color .2s; display: flex; flex-direction: column; gap: .8rem; }
+.gradeCard:hover { transform: translateY(-3px); border-color: var(--accent); }
+.gradeCard .big { font-size: 3.3rem; font-weight: 800; line-height: 1; color: var(--accent); }
+.gradeCard h3 { font-size: 1.15rem; font-weight: 800; }
+.tags { display: flex; gap: .4rem; flex-wrap: wrap; }
+.tag { padding: .15rem .65rem; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: .82rem; font-weight: 700; font-family: var(--mono); }
+.bar { height: .5rem; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar > div { height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .4s; }
+.barText { font-size: .85rem; color: var(--muted); }
+
+/* ---------- lesson view ---------- */
+#lessonView { display: none; }
+.lessonHead { padding: 1.6rem 0 0; }
+.lessonHead .row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.lessonHead h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 800; margin-top: 1rem; letter-spacing: -.01em; }
+.lessonHead .sub { color: var(--muted); }
+.tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1.2rem 0 1.6rem; }
+.tab { border: 1.5px solid var(--line); background: var(--card); border-radius: 99px; padding: .45rem 1rem; font-weight: 700; display: inline-flex; align-items: center; gap: .45rem; transition: border-color .15s, background .15s; }
+.tab:hover { border-color: var(--accent); }
+.tab.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tab .dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--line); }
+.tab.half .dot { background: linear-gradient(90deg, var(--accent) 50%, var(--line) 50%); }
+.tab.full .dot { background: var(--good); }
+.tab.active .dot { box-shadow: 0 0 0 2px var(--on-accent); }
+
+#panel { padding-bottom: 4rem; display: grid; gap: 1.1rem; }
+.lt { font-size: 2rem; font-weight: 800; }
+.lead { color: var(--muted); font-size: 1.08rem; max-width: 62ch; display: grid; gap: .6rem; }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow); }
+.label { font-weight: 800; font-size: 1.02rem; margin-bottom: .7rem; display: flex; align-items: center; gap: .5rem; }
+.label::before { content: ""; width: .5rem; height: 1.1rem; border-radius: 3px; background: var(--accent); }
+.hint { color: var(--muted); margin-bottom: .8rem; }
+
+.code { background: #12161f; color: #e8ebf2; font-family: var(--mono); font-size: .93rem; line-height: 1.8; padding: 1rem 1.2rem; border-radius: var(--rs); margin: .8rem 0; overflow-x: auto; white-space: pre; border-left: 5px solid var(--accent); }
+.kw { color: #ff8f7a; } .st { color: #8fe0a9; }
+.console { background: #12161f; color: #e8ebf2; font-family: var(--mono); font-size: .9rem; border-radius: var(--rs); padding: .8rem 1.1rem; min-height: 3.2rem; margin-top: .8rem; max-height: 14rem; overflow-y: auto; }
+.console .ln { animation: pop .25s ease; }
+.console .none { color: #7f8aa0; }
+@keyframes pop { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+
+.ctrl { display: flex; flex-wrap: wrap; gap: 1.1rem 1.6rem; align-items: end; margin: .6rem 0 .4rem; }
+.field { display: grid; gap: .3rem; font-size: .88rem; color: var(--muted); font-weight: 700; }
+.field input[type="range"] { accent-color: var(--accent); width: 190px; }
+.field input[type="number"], .field select { width: 5.5rem; padding: .45rem .6rem; border: 1.5px solid var(--line); border-radius: var(--rs); background: var(--bg); font-family: var(--mono); }
+.check { display: flex; align-items: center; gap: .5rem; font-weight: 700; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 1.1rem; height: 1.1rem; }
+.val { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+
+.pill { display: inline-block; padding: .4rem 1rem; border-radius: 99px; background: var(--line); font-family: var(--mono); font-weight: 500; font-size: .92rem; transition: background .2s; }
+.pill.on { background: var(--accent); color: var(--on-accent); }
+.pill.good { background: var(--good); color: #fff; }
+.pill.bad { background: var(--bad); color: #fff; }
+
+.fb { min-height: 1.5rem; margin-top: .7rem; font-weight: 700; }
+.fb.good { color: var(--good); } .fb.bad { color: var(--bad); }
+
+/* ordering game */
+.pool { display: flex; gap: .55rem; flex-wrap: wrap; margin-bottom: 1rem; min-height: 2.8rem; }
+.step { padding: .6rem 1rem; border: 1.5px solid var(--line); background: var(--card); border-radius: var(--rs); font-weight: 700; box-shadow: var(--shadow); }
+.step:hover { border-color: var(--accent); transform: translateY(-2px); }
+.slots { list-style: none; padding: 0; margin: 0 0 .6rem; display: grid; gap: .5rem; }
+.slots li { display: flex; gap: .8rem; align-items: center; padding: .6rem .9rem; border: 1.5px dashed var(--line); border-radius: var(--rs); min-height: 2.9rem; color: var(--muted); }
+.slots li.filled { border-style: solid; border-color: var(--accent-line); background: var(--accent-soft); color: var(--ink); font-weight: 700; animation: pop .3s ease; }
+.slots b { width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--line); display: grid; place-items: center; font-size: .85rem; flex: none; }
+.slots li.filled b { background: var(--accent); color: var(--on-accent); }
+.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* switches (OR) */
+.switches { display: flex; gap: 1rem; flex-wrap: wrap; margin: .8rem 0; }
+.tg { width: 9.5rem; padding: 1rem; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--card); display: grid; justify-items: center; gap: .5rem; font-weight: 800; transition: border-color .2s, background .2s; }
+.tg .bulb { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--line); transition: .25s; }
+.tg.on { border-color: var(--accent); background: var(--accent-soft); }
+.tg.on .bulb { background: var(--accent); box-shadow: 0 0 0 6px var(--accent-soft), 0 0 22px var(--accent); }
+.tg small { font-weight: 600; color: var(--muted); }
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: var(--rs); overflow: hidden; background: var(--card); }
+.seg button { border: 0; background: transparent; padding: .45rem .9rem; font-weight: 700; font-size: .9rem; }
+.seg button.active { background: var(--accent); color: var(--on-accent); }
+table.tt { border-collapse: collapse; margin-top: 1rem; font-family: var(--mono); font-size: .9rem; width: 100%; max-width: 26rem; }
+.tt th, .tt td { padding: .45rem .8rem; border-bottom: 1px solid var(--line); text-align: center; }
+.tt th { color: var(--muted); font-weight: 500; }
+.tt tr.cur td { background: var(--accent-soft); font-weight: 500; }
+.tt tr.seen td:first-child::before { content: "✓ "; color: var(--good); }
+
+/* cells */
+.cells { display: flex; gap: .45rem; flex-wrap: wrap; margin: .9rem 0 .2rem; }
+.cell { width: 2.8rem; height: 2.8rem; border-radius: var(--rs); border: 1.5px solid var(--line); display: grid; place-items: center; font-family: var(--mono); background: var(--card); transition: background .2s, transform .2s, opacity .2s; }
+.cell.hit { border-color: var(--accent-line); background: var(--accent-soft); }
+.cell.cur { background: var(--accent); border-color: var(--accent); color: var(--on-accent); transform: translateY(-5px) scale(1.08); }
+.cell.done { background: var(--accent-soft); border-color: var(--accent-line); }
+.cell.skip { border-style: dashed; opacity: .55; }
+.cell.stop { background: var(--bad); border-color: var(--bad); color: #fff; }
+.cell.unreached { opacity: .3; }
+
+/* while */
+.whileGrid { display: flex; gap: 1.6rem; flex-wrap: wrap; align-items: center; margin: 1rem 0; }
+.counter { width: 7.5rem; height: 7.5rem; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-family: var(--mono); font-size: 2.7rem; font-weight: 500; transition: transform .2s; }
+.counter.tick { transform: scale(1.12); }
+.meter { display: flex; gap: .3rem; flex: 1; min-width: 12rem; }
+.meter span { flex: 1; height: 1.6rem; border-radius: 6px; background: var(--line); transition: background .25s; }
+.meter span.on { background: var(--accent); }
+
+/* flowchart */
+.flowsvg { width: 100%; max-width: 520px; height: auto; display: block; margin: .6rem auto; }
+.fn rect, .fn polygon { fill: var(--card); stroke: var(--ink); stroke-width: 2; transition: fill .25s, stroke .25s; }
+.fn text { fill: var(--ink); font: 700 13px var(--sans); text-anchor: middle; dominant-baseline: middle; transition: fill .25s; }
+.fn.on rect, .fn.on polygon { fill: var(--accent); stroke: var(--accent); }
+.fn.on text { fill: var(--on-accent); }
+.fe { stroke: var(--muted); stroke-width: 2; fill: none; transition: stroke .25s; }
+.fe.on { stroke: var(--accent); stroke-width: 3.5; }
+.ft { font: 700 12px var(--sans); fill: var(--muted); }
+
+/* quiz */
+.opts { display: grid; gap: .5rem; }
+.opt { text-align: left; padding: .75rem 1rem; border: 1.5px solid var(--line); border-radius: var(--rs); background: var(--bg); font-weight: 600; transition: border-color .15s, background .15s; }
+.opt:hover { border-color: var(--accent); }
+.opt.good { background: color-mix(in srgb, var(--good) 15%, var(--card)); border-color: var(--good); }
+.opt.bad { background: color-mix(in srgb, var(--bad) 13%, var(--card)); border-color: var(--bad); }
+.q { font-weight: 700; margin-bottom: .8rem; white-space: pre-line; }
+
+/* example figure */
+.example { padding: 1.2rem 1.4rem 1.2rem; }
+.example svg { width: 100%; height: auto; display: block; border-radius: var(--rs); background: var(--accent-soft); }
+.example figcaption { margin-top: .8rem; color: var(--muted); font-size: .95rem; }
+.example .label { margin-bottom: .9rem; }
+.sv .t { font: 700 14px var(--sans); fill: var(--ink); text-anchor: middle; }
+.sv .s { font: 600 12px var(--sans); fill: var(--muted); text-anchor: middle; }
+.sv .n { font: 700 13px var(--mono); fill: var(--ink); text-anchor: middle; dominant-baseline: middle; }
+.sv .box { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.sv .ac { fill: var(--accent); }
+.sv .acs { stroke: var(--accent); fill: none; stroke-width: 3; stroke-linecap: round; }
+.sv .ln { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sv .mut { fill: var(--line); }
+
+.nextrow { display: flex; justify-content: flex-end; }
+
+/* ---------- settings ---------- */
+#scrim { position: fixed; inset: 0; background: rgba(10,14,22,.45); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 40; }
+#drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(380px, 100%); background: var(--card); z-index: 50; transform: translateX(105%); transition: transform .3s; box-shadow: -10px 0 40px rgba(0,0,0,.18); padding: calc(1.2rem + env(safe-area-inset-top, 0px)) 1.4rem calc(1.4rem + env(safe-area-inset-bottom, 0px)); overflow-y: auto; display: grid; align-content: start; gap: 1.3rem; }
+body.open #scrim { opacity: 1; pointer-events: auto; }
+body.open #drawer { transform: none; }
+.dhead { display: flex; justify-content: space-between; align-items: center; }
+.dhead h2 { font-size: 1.25rem; font-weight: 800; }
+.set { display: grid; gap: .55rem; }
+.set > span { font-weight: 800; font-size: .95rem; }
+.swatches { display: flex; gap: .55rem; flex-wrap: wrap; align-items: center; }
+.sw { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 3px solid var(--card); box-shadow: 0 0 0 1.5px var(--line); transition: transform .15s; }
+.sw:hover { transform: scale(1.1); }
+.sw.active { box-shadow: 0 0 0 3px var(--ink); }
+input[type="color"] { width: 2.2rem; height: 2.2rem; border: 0; padding: 0; background: none; border-radius: 50%; overflow: hidden; cursor: pointer; }
+.set input[type="text"] { padding: .55rem .8rem; border: 1.5px solid var(--line); border-radius: var(--rs); background: var(--bg); width: 100%; }
+.set .seg { width: fit-content; }
+.dlist { display: grid; gap: .5rem; }
+
+@media (max-width: 700px) {
+  .gradeGrid { grid-template-columns: 1fr; }
+  .hero { padding-top: 2.6rem; }
+  .field input[type="range"] { width: 150px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <button class="brand" onclick="showHome()" aria-label="Нүүр хуудас"><i>&lt;/&gt;</i><span id="brandText">Багш нарын нэг өдөр</span></button>
+    <button class="btn small" onclick="toggleDrawer(true)">Тохиргоо</button>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="homeView">
+    <div class="wrap">
+      <div class="hero">
+        <h1 id="siteTitle">Багш нарын нэг өдөр</h1>
+        <p>Код бичихийг тоглож сурцгаая. Ангиа сонгоод, дасгалуудыг өөрөө туршаарай.</p>
+        <div class="teacher" id="teacherName"></div>
+      </div>
+      <div class="gradeGrid">
+        <button class="gradeCard" onclick="openGrade(9)">
+          <div class="big">9</div>
+          <h3>9-р анги</h3>
+          <div class="tags"><span class="tag">Flowgorithm</span><span class="tag">IF</span><span class="tag">OR</span></div>
+          <div class="bar"><div id="bar9"></div></div>
+          <div class="barText" id="barText9"></div>
+        </button>
+        <button class="gradeCard" onclick="openGrade(11)">
+          <div class="big">11</div>
+          <h3>11-р анги</h3>
+          <div class="tags"><span class="tag">Python</span><span class="tag">FOR</span><span class="tag">WHILE</span><span class="tag">BREAK</span></div>
+          <div class="bar"><div id="bar11"></div></div>
+          <div class="barText" id="barText11"></div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LESSON -->
+  <section id="lessonView">
+    <div class="wrap">
+      <div class="lessonHead">
+        <div class="row">
+          <button class="btn small" onclick="showHome()">‹ Анги солих</button>
+          <div class="barText" id="gradeProg"></div>
+        </div>
+        <h1 id="lessonTitle"></h1>
+        <div class="sub" id="gradeSub"></div>
+        <div class="tabs" id="tabs"></div>
+      </div>
+      <div id="panel"></div>
+    </div>
+  </section>
+</main>
+
+<!-- SETTINGS -->
+<div id="scrim" onclick="toggleDrawer(false)"></div>
+<aside id="drawer" aria-label="Тохиргоо">
+  <div class="dhead"><h2>Тохиргоо</h2><button class="btn small" onclick="toggleDrawer(false)">Хаах</button></div>
+  <div class="set"><span>Үндсэн өнгө</span>
+    <div class="swatches" id="swatches"></div>
+    <label class="check"><input type="color" id="customColor"> Өөрийн өнгө сонгох</label>
+  </div>
+  <div class="set"><span>Дэвсгэр</span><div class="seg" id="segMode"></div></div>
+  <div class="set"><span>Үсгийн хэмжээ</span><div class="seg" id="segSize"></div></div>
+  <div class="set"><span>Булангийн хэлбэр</span><div class="seg" id="segRadius"></div></div>
+  <div class="set"><span>Хөдөлгөөн</span><div class="seg" id="segAnim"></div></div>
+  <div class="set"><span>Гарчиг</span><input type="text" id="inTitle" maxlength="40"></div>
+  <div class="set"><span>Багшийн нэр</span><input type="text" id="inTeacher" maxlength="40" placeholder="Жишээ нь: Болормаа багш"></div>
+  <div class="dlist">
+    <button class="btn" onclick="resetProgress()">Явцыг шинээр эхлүүлэх</button>
+    <button class="btn" onclick="resetAll()">Бүх тохиргоог анхных болгох</button>
+  </div>
+</aside>
+
+<script>
+/* =============== helpers & state =============== */
+const $ = id => document.getElementById(id);
+const defaults = { accent: '#3b6cf0', mode: 'auto', size: 1, radius: 'round', anim: true, title: 'Багш нарын нэг өдөр', teacher: '', done: {} };
+let state = { ...defaults, done: {} };
+const store = {
+  get() { try { return localStorage.getItem('tdState'); } catch (e) { return null; } },
+  set(v) { try { localStorage.setItem('tdState', v); } catch (e) {} }
+};
+(function load() {
+  const s = store.get();
+  if (s) { try { state = { ...defaults, ...JSON.parse(s) }; } catch (e) {} }
+})();
+function save() { store.set(JSON.stringify(state)); }
+const sleep = ms => new Promise(r => setTimeout(r, state.anim ? ms : Math.min(ms, 30)));
+
+function hl(c) {
+  return c.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/("[^"]*")/g, '<span class="st">$1</span>')
+    .replace(/\b(if|else|for|in|while|break|continue|or|and)\b/g, '<span class="kw">$1</span>');
+}
+function lum(hex) {
+  const h = hex.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4));
+  return .2126 * r + .7152 * g + .0722 * b;
+}
+
+/* =============== settings =============== */
+const SWATCHES = [['#3b6cf0', 'Хөх'], ['#1f9d63', 'Ногоон'], ['#e5484d', 'Улаан'], ['#8b5cf6', 'Нил ягаан'], ['#f08a24', 'Улбар шар'], ['#e0509a', 'Ягаан'], ['#0f9fb5', 'Цэнхэр ногоон']];
+function apply() {
+  const r = document.documentElement;
+  r.style.setProperty('--accent', state.accent);
+  r.style.setProperty('--on-accent', lum(state.accent) > .45 ? '#14181f' : '#ffffff');
+  if (state.mode === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', state.mode);
+  r.style.fontSize = [15, 17, 19.5][state.size] + 'px';
+  r.setAttribute('data-radius', state.radius);
+  r.setAttribute('data-anim', state.anim ? 'on' : 'off');
+  $('siteTitle').textContent = state.title || defaults.title;
+  $('brandText').textContent = state.title || defaults.title;
+  document.title = state.title || defaults.title;
+  $('teacherName').textContent = state.teacher ? 'Багш: ' + state.teacher : '';
+  buildSettings();
+  save();
+}
+function seg(id, opts, cur, set) {
+  const el = $(id); el.innerHTML = '';
+  opts.forEach(([v, t]) => {
+    const b = document.createElement('button'); b.textContent = t;
+    if (v === cur) b.classList.add('active');
+    b.onclick = () => { set(v); apply(); };
+    el.appendChild(b);
+  });
+}
+function buildSettings() {
+  const sw = $('swatches'); sw.innerHTML = '';
+  SWATCHES.forEach(([c, n]) => {
+    const b = document.createElement('button'); b.className = 'sw' + (c === state.accent ? ' active' : '');
+    b.style.background = c; b.title = n; b.setAttribute('aria-label', n);
+    b.onclick = () => { state.accent = c; apply(); };
+    sw.appendChild(b);
+  });
+  $('customColor').value = state.accent;
+  seg('segMode', [['auto', 'Авто'], ['light', 'Цайвар'], ['dark', 'Бараан']], state.mode, v => state.mode = v);
+  seg('segSize', [[0, 'Жижиг'], [1, 'Дунд'], [2, 'Том']], state.size, v => state.size = v);
+  seg('segRadius', [['round', 'Дугуй'], ['sharp', 'Шулуун']], state.radius, v => state.radius = v);
+  seg('segAnim', [[true, 'Асаах'], [false, 'Унтраах']], state.anim, v => state.anim = v);
+  if (document.activeElement !== $('inTitle')) $('inTitle').value = state.title;
+  if (document.activeElement !== $('inTeacher')) $('inTeacher').value = state.teacher;
+  refreshProgress();
+}
+$('customColor').addEventListener('input', e => { state.accent = e.target.value; apply(); });
+$('inTitle').addEventListener('input', e => { state.title = e.target.value; apply(); });
+$('inTeacher').addEventListener('input', e => { state.teacher = e.target.value; apply(); });
+function toggleDrawer(open) { document.body.classList.toggle('open', open); }
+function resetProgress() { if (confirm('Бүх явцыг арилгах уу?')) { state.done = {}; apply(); if (curLesson) renderTabs(); } }
+function resetAll() { if (confirm('Бүх тохиргоо, явцыг анхных болгох уу?')) { state = { ...defaults, done: {} }; apply(); if (curLesson) renderTabs(); } }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleDrawer(false); });
+
+/* =============== example images (inline SVG) =============== */
+const SVG = {
+nIntro: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="Өглөөний дөрвөн алхам"><g>
+<rect class="box" x="20" y="35" width="90" height="95" rx="14"/><circle class="ac" cx="65" cy="82" r="15"/>
+<g class="ln"><path d="M65 55v6M65 103v6M38 82h6M86 82h6M46 63l4 4M80 97l4 4M84 63l-4 4M50 97l-4 4"/></g>
+<rect class="box" x="140" y="35" width="90" height="95" rx="14"/><rect class="ln" x="162" y="78" width="46" height="12" rx="6" fill="var(--card)"/><rect class="ac" x="208" y="74" width="12" height="20" rx="3"/>
+<rect class="box" x="260" y="35" width="90" height="95" rx="14"/><rect class="ac" x="287" y="68" width="34" height="34" rx="8"/><path class="ln" d="M321 76h8a8 8 0 010 16h-8"/>
+<rect class="box" x="380" y="35" width="90" height="95" rx="14"/><rect class="ac" x="402" y="68" width="46" height="40" rx="10"/><path class="ln" d="M414 68v-8a10 10 0 0120 0v8"/>
+<g class="ln"><path d="M113 82h24m-6-6l6 6-6 6M233 82h24m-6-6l6 6-6 6M353 82h24m-6-6l6 6-6 6"/></g>
+<text class="t" x="65" y="155">1. Босох</text><text class="t" x="185" y="155">2. Угаах</text><text class="t" x="305" y="155">3. Цай уух</text><text class="t" x="425" y="155">4. Явах</text>
+<text class="s" x="240" y="185">Алхмууд дарааллаараа ажиллана</text></g></svg>`,
+nIf: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="18 нас шалгах хаалга"><g>
+<circle class="ac" cx="55" cy="70" r="16"/><path class="ln" d="M55 86v44M55 100l-22 18M55 100l22 18M55 130l-18 38M55 130l18 38"/>
+<text class="s" x="55" y="190">age = 20</text>
+<path class="ln" d="M100 100h60m-8-8l8 8-8 8"/>
+<rect class="box" x="170" y="60" width="90" height="80" rx="12"/><text class="t" x="215" y="106" style="font-size:24px">18+ ?</text>
+<path class="ln" d="M262 82l60-34m-10-1l10-1-4 9"/><path class="ln" d="M262 118l60 34m-10 1l10 1-4-9"/>
+<rect class="ac" x="330" y="26" width="130" height="46" rx="12"/><text x="395" y="54" style="font:700 14px var(--sans);fill:var(--on-accent);text-anchor:middle">Тийм: орно</text>
+<rect class="box" x="330" y="128" width="130" height="46" rx="12"/><text class="t" x="395" y="156">Үгүй: хүлээнэ</text>
+</g></svg>`,
+nOr: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="Бороо эсвэл цас орвол шүхэр"><g>
+<g fill="var(--card)" stroke="var(--ink)" stroke-width="2"><circle cx="70" cy="62" r="24"/><circle cx="105" cy="50" r="30"/><circle cx="142" cy="64" r="22"/><rect x="62" y="64" width="92" height="22" stroke="none"/></g>
+<g class="ln"><path d="M75 100l-6 16M100 100l-6 16M125 100l-6 16" stroke="var(--accent)"/></g>
+<g class="ac"><circle cx="150" cy="106" r="4"/><circle cx="168" cy="122" r="4"/><circle cx="138" cy="134" r="4"/></g>
+<text class="t" x="100" y="165">бороо</text><text class="t" x="170" y="165">цас</text>
+<text x="215" y="82" style="font:800 22px var(--mono);fill:var(--accent);text-anchor:middle">or</text>
+<path class="ln" d="M245 100h36m-8-8l8 8-8 8"/>
+<path class="ac" d="M300 110a60 60 0 01120 0z"/><path class="ln" d="M360 110v46a10 10 0 01-20 0"/>
+<text class="t" x="360" y="185">Шүхэр авна</text></g></svg>`,
+nFlow: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="Flowchart-ын үндсэн дүрсүүд"><g>
+<rect class="box" x="10" y="78" width="72" height="40" rx="20"/><text class="n" x="46" y="98">Start</text>
+<polygon class="box" points="116,78 190,78 180,118 106,118"/><text class="n" x="148" y="98">Input</text>
+<polygon class="ac" points="255,64 300,98 255,132 210,98" stroke="var(--ink)" stroke-width="2"/><text x="255" y="98" style="font:700 13px var(--mono);fill:var(--on-accent);text-anchor:middle;dominant-baseline:middle">if</text>
+<rect class="box" x="318" y="78" width="80" height="40" rx="4"/><text class="n" x="358" y="98">Output</text>
+<rect class="box" x="414" y="78" width="60" height="40" rx="20"/><text class="n" x="444" y="98">End</text>
+<g class="ln"><path d="M84 98h20M192 98h16M302 98h14M400 98h12"/></g>
+<text class="s" x="46" y="150">Эхлэл</text><text class="s" x="148" y="150">Өгөгдөл авах</text><text class="s" x="255" y="150">Шалгах (ромб)</text><text class="s" x="358" y="150">Хэвлэх</text><text class="s" x="444" y="150">Төгсгөл</text></g></svg>`,
+eIntro: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="Давталт: нэг үйлдлийг 5 удаа"><g>
+<circle cx="90" cy="100" r="52" class="acs" stroke-dasharray="280 60"/><path class="ac" d="M130 52l22 4-14 18z" transform="rotate(8 130 52)"/>
+<text x="90" y="108" style="font:800 28px var(--mono);fill:var(--ink);text-anchor:middle">× 5</text>
+<g class="n"><circle class="ac" cx="230" cy="100" r="20"/><circle class="ac" cx="280" cy="100" r="20"/><circle class="ac" cx="330" cy="100" r="20"/><circle class="ac" cx="380" cy="100" r="20"/><circle class="ac" cx="430" cy="100" r="20"/></g>
+<g style="font:700 15px var(--mono);fill:var(--on-accent);text-anchor:middle;dominant-baseline:middle"><text x="230" y="100">0</text><text x="280" y="100">1</text><text x="330" y="100">2</text><text x="380" y="100">3</text><text x="430" y="100">4</text></g>
+<text class="s" x="330" y="150">print(i) нэг бүрд нь ажиллана</text><text class="s" x="90" y="178">нэг код, олон давталт</text></g></svg>`,
+eFor: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="range(5) шатан дээр"><g>
+<rect class="box" x="30" y="140" width="80" height="35"/><rect class="box" x="110" y="115" width="80" height="60"/><rect class="box" x="190" y="90" width="80" height="85"/><rect class="box" x="270" y="65" width="80" height="110"/><rect class="box" x="350" y="40" width="80" height="135"/>
+<g class="n" style="font-size:18px"><text x="70" y="160">0</text><text x="150" y="145">1</text><text x="230" y="130">2</text><text x="310" y="115">3</text><text x="390" y="100">4</text></g>
+<circle class="ac" cx="230" cy="70" r="14"/><path class="ln" d="M236 50c0 0 20-18 38-4" stroke-dasharray="4 5"/>
+<text class="s" x="230" y="30">i = 2 (одоо энд байна)</text>
+<text class="s" x="240" y="195">range(5) → 0, 1, 2, 3, 4</text></g></svg>`,
+eWhile: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="Аяга дүүртэл ус цутгах"><g>
+<g fill="var(--card)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"><path d="M50 30h70l-8 110H58z"/><path d="M205 30h70l-8 110h-54z"/><path d="M360 30h70l-8 110h-54z"/></g>
+<path class="ac" d="M57 128h56l-1 12H58z"/><path class="ac" d="M212 80h56l-5 60h-46z"/><path class="ac" d="M367 36h56l-1 104h-54z"/>
+<text class="t" x="85" y="165">count = 0</text><text class="s" x="85" y="185">0 &lt; 5 үнэн, цутгана</text>
+<text class="t" x="240" y="165">count = 3</text><text class="s" x="240" y="185">3 &lt; 5 үнэн, цутгана</text>
+<text class="t" x="395" y="165">count = 5</text><text class="s" x="395" y="185">5 &lt; 5 худал, зогсоно</text></g></svg>`,
+eBreak: `<svg viewBox="0 0 480 200" class="sv" role="img" aria-label="break ба continue-ийн ялгаа"><g>
+<text class="t" x="20" y="22" style="text-anchor:start">break: i == 5 дээр бүгд зогсно</text>
+<g id="rowA"></g>
+<g class="n">
+<rect class="ac" x="20" y="34" width="38" height="38" rx="8"/><rect class="ac" x="64" y="34" width="38" height="38" rx="8"/><rect class="ac" x="108" y="34" width="38" height="38" rx="8"/><rect class="ac" x="152" y="34" width="38" height="38" rx="8"/><rect class="ac" x="196" y="34" width="38" height="38" rx="8"/>
+<rect x="240" y="34" width="38" height="38" rx="8" fill="#e5484d"/>
+<rect class="mut" x="284" y="34" width="38" height="38" rx="8"/><rect class="mut" x="328" y="34" width="38" height="38" rx="8"/><rect class="mut" x="372" y="34" width="38" height="38" rx="8"/><rect class="mut" x="416" y="34" width="38" height="38" rx="8"/></g>
+<g style="font:700 14px var(--mono);text-anchor:middle;dominant-baseline:middle"><g fill="var(--on-accent)"><text x="39" y="54">0</text><text x="83" y="54">1</text><text x="127" y="54">2</text><text x="171" y="54">3</text><text x="215" y="54">4</text></g><text x="259" y="54" fill="#fff">5</text><g fill="var(--muted)"><text x="303" y="54">6</text><text x="347" y="54">7</text><text x="391" y="54">8</text><text x="435" y="54">9</text></g></g>
+<text class="t" x="20" y="116" style="text-anchor:start">continue: 5-г алгасаад үргэлжилнэ</text>
+<g><rect class="ac" x="20" y="128" width="38" height="38" rx="8"/><rect class="ac" x="64" y="128" width="38" height="38" rx="8"/><rect class="ac" x="108" y="128" width="38" height="38" rx="8"/><rect class="ac" x="152" y="128" width="38" height="38" rx="8"/><rect class="ac" x="196" y="128" width="38" height="38" rx="8"/>
+<rect x="240" y="128" width="38" height="38" rx="8" fill="var(--card)" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 4"/>
+<rect class="ac" x="284" y="128" width="38" height="38" rx="8"/><rect class="ac" x="328" y="128" width="38" height="38" rx="8"/><rect class="ac" x="372" y="128" width="38" height="38" rx="8"/><rect class="ac" x="416" y="128" width="38" height="38" rx="8"/></g>
+<g style="font:700 14px var(--mono);text-anchor:middle;dominant-baseline:middle"><g fill="var(--on-accent)"><text x="39" y="148">0</text><text x="83" y="148">1</text><text x="127" y="148">2</text><text x="171" y="148">3</text><text x="215" y="148">4</text><text x="303" y="148">6</text><text x="347" y="148">7</text><text x="391" y="148">8</text><text x="435" y="148">9</text></g><text x="259" y="148" fill="var(--muted)">5</text></g>
+<path class="ln" d="M236 122c10-14 28-14 38 0" stroke="var(--muted)" style="stroke-dasharray:4 4"/>
+</g></svg>`
+};
+
+/* =============== lesson building blocks =============== */
+function quizHtml(q, opts, ans, why) {
+  return `<section class="card quiz" data-ans="${ans}" data-why="${why}">
+    <div class="label">Жижиг тест</div><p class="q">${q}</p>
+    <div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>
+    <div class="fb" aria-live="polite"></div></section>`;
+}
+function shell(o) {
+  return `<h2 class="lt">${o.title}</h2><div class="lead">${o.text}</div>
+  <section class="card"><div class="label">Дасгал: өөрөө туршаад үз</div>${o.activity}</section>
+  ${o.quiz}
+  <figure class="card example"><div class="label">Жишээ зураг</div>${o.svg}<figcaption>${o.cap}</figcaption></figure>`;
+}
+function bindQuiz() {
+  document.querySelectorAll('.quiz').forEach(q => {
+    const fb = q.querySelector('.fb');
+    q.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (q.dataset.finished) return;
+      if (+b.dataset.i === +q.dataset.ans) {
+        b.classList.add('good'); fb.className = 'fb good'; fb.textContent = 'Зөв! ' + q.dataset.why;
+        q.dataset.finished = 1; markDone('q');
+      } else {
+        b.classList.add('bad'); fb.className = 'fb bad'; fb.textContent = 'Дахин нэг оролдоод үз.';
+      }
+    });
+  });
+}
+const act = () => markDone('a');
+function pad(n) { return ' '.repeat(n); }
+
+/* =============== lessons =============== */
+const LESSONS = {
+9: [
+{ id: 'intro', t: 'Эхлэл', build: () => shell({
+  title: 'Эхлэл',
+  text: `<p>Програм гэдэг нь компьютерт хийх зүйлээ алхам алхмаар хэлж өгдөг заавар юм.</p><p>Flowgorithm дээр бид эдгээр алхмуудыг flowchart ашиглан зурж болно.</p>`,
+  activity: `<p class="hint">Өглөөний алгоритмыг зөв дарааллаар нь байрлуул. Алхмуудыг нэг нэгээр нь дар.</p>
+    <div class="pool" id="pool"></div><ol class="slots" id="slots"></ol><div class="fb" id="actFb" aria-live="polite"></div>
+    <button class="btn small" id="resetSteps">Дахин эхлэх</button>`,
+  quiz: quizHtml('Алгоритмд алхмуудын дараалал яагаад чухал вэ?', ['Дараалал өөрчлөгдвөл үр дүн өөр болдог', 'Дараалал огт хамаагүй', 'Зөвхөн эхний алхам л чухал'], 0, 'Компьютер алхмуудыг дарааллаар нь яг заасны дагуу гүйцэтгэнэ.'),
+  svg: SVG.nIntro, cap: 'Өглөөний дөрвөн алхам нь жишээ алгоритм. Дараалал нь алдагдвал үр дүн өөр болно.'
+}), init: () => {
+  const steps = ['Босох', 'Шүдээ угаах', 'Өглөөний цай уух', 'Сургуульд явах'];
+  const order = [2, 0, 3, 1]; let next = 0;
+  const pool = $('pool'), slots = $('slots'), fb = $('actFb');
+  function draw() {
+    pool.innerHTML = '';
+    order.forEach(i => {
+      if (i < next) return;
+      const b = document.createElement('button'); b.className = 'step'; b.textContent = steps[i];
+      b.onclick = () => {
+        if (i === next) { next++; fb.textContent = ''; draw(); }
+        else { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400); fb.className = 'fb bad'; fb.textContent = 'Энэ алхам одоохондоо биш. Эхлээд юуг хийдэг вэ?'; }
+      };
+      pool.appendChild(b);
+    });
+    slots.innerHTML = steps.map((s, k) => `<li class="${k < next ? 'filled' : ''}"><b>${k + 1}</b>${k < next ? s : 'хоосон'}</li>`).join('');
+    if (next === steps.length) { fb.className = 'fb good'; fb.textContent = 'Зөв! Энэ бол алгоритм: алхмуудын зөв дараалал.'; act(); }
+  }
+  $('resetSteps').onclick = () => { next = 0; fb.textContent = ''; draw(); };
+  draw();
+}},
+
+{ id: 'if', t: 'IF', build: () => shell({
+  title: 'IF',
+  text: `<p>IF гэдэг нь нөхцөл шалгана. Нөхцөл үнэн бол тодорхой үйлдэл хийнэ.</p>`,
+  activity: `<div class="ctrl"><label class="field">Нас: <span class="val" id="ageVal">15</span><input type="range" id="age" min="0" max="30" value="15"></label>
+    <label class="check"><input type="checkbox" id="elseOn"> else нэмэх</label></div>
+    <pre class="code" id="ifCode"></pre>
+    <div class="row"><span class="pill" id="ifCond"></span></div>
+    <div class="console" id="ifOut"></div>
+    <p class="hint" style="margin-top:.8rem" id="ifSeen">Гулсуургаар 18-аас дээш, доош утга сонгож үз.</p>`,
+  quiz: quizHtml('age = 12\nif age >= 18:\n    print("Насанд хүрсэн")\n\nЮу хэвлэгдэх вэ?', ['Насанд хүрсэн', 'Юу ч хэвлэгдэхгүй', 'Алдаа гарна'], 1, 'Нөхцөл худал учир IF доторх үйлдэл алгасагдана.'),
+  svg: SVG.nIf, cap: 'IF хаалга шиг: нөхцөл үнэн бол нэвтэрнэ, үгүй бол өөр зам руу явна.'
+}), init: () => {
+  const seen = new Set();
+  function draw() {
+    const age = +$('age').value, el = $('elseOn').checked, ok = age >= 18;
+    $('ageVal').textContent = age;
+    $('ifCode').innerHTML = hl(`age = ${age}\nif age >= 18:\n    print("Насанд хүрсэн")` + (el ? `\nelse:\n    print("Хүүхэд")` : ''));
+    const c = $('ifCond'); c.className = 'pill ' + (ok ? 'good' : 'bad'); c.textContent = `${age} >= 18  →  ${ok ? 'ҮНЭН' : 'ХУДАЛ'}`;
+    $('ifOut').innerHTML = ok ? '<div class="ln">› Насанд хүрсэн</div>' : (el ? '<div class="ln">› Хүүхэд</div>' : '<div class="none">(юу ч хэвлэгдсэнгүй)</div>');
+    seen.add(ok);
+    if (seen.size === 2) { $('ifSeen').textContent = 'Сайн байна! Үнэн, худал хоёр тохиолдлыг хоёуланг нь үзлээ.'; act(); }
+  }
+  ['age', 'elseOn'].forEach(i => $(i).addEventListener('input', draw)); draw();
+}},
+
+{ id: 'or', t: 'OR', build: () => shell({
+  title: 'OR',
+  text: `<p>OR нь хоёр нөхцөлийн аль нэг нь үнэн байхад нийт нөхцөлийг үнэн болгоно.</p>`,
+  activity: `<div class="switches">
+      <button class="tg" id="swRain"><div class="bulb"></div>БОРОО<small id="rainS">худал</small></button>
+      <button class="tg" id="swSnow"><div class="bulb"></div>ЦАС<small id="snowS">худал</small></button></div>
+    <div class="row"><span style="font-weight:700">Холбоос:</span><div class="seg" id="orMode"></div></div>
+    <pre class="code" id="orCode"></pre>
+    <span class="pill" id="orOut"></span>
+    <table class="tt"><thead><tr><th>rain</th><th>snow</th><th>үр дүн</th></tr></thead><tbody id="orTable"></tbody></table>
+    <p class="hint" style="margin-top:.8rem" id="orSeen"></p>`,
+  quiz: quizHtml('rain = False, snow = True бол\n(rain or snow) юу вэ?', ['ХУДАЛ', 'ҮНЭН', 'Алдаа'], 1, 'OR-д аль нэг нь үнэн бол бүхэлдээ үнэн болно.'),
+  svg: SVG.nOr, cap: 'Бороо ЭСВЭЛ цас орвол шүхэр авна. Хоёрын аль нэг нь л хангалттай.'
+}), init: () => {
+  let rain = false, snow = false, mode = 'or'; const seen = new Set();
+  const calc = () => mode === 'or' ? (rain || snow) : (rain && snow);
+  function draw() {
+    $('swRain').classList.toggle('on', rain); $('swSnow').classList.toggle('on', snow);
+    $('rainS').textContent = rain ? 'үнэн' : 'худал'; $('snowS').textContent = snow ? 'үнэн' : 'худал';
+    $('orCode').innerHTML = hl(`if rain ${mode} snow:\n    print("Цаг агаар муу байна")`);
+    const r = calc(); const o = $('orOut'); o.className = 'pill ' + (r ? 'on' : ''); o.textContent = `rain ${mode} snow = ${r ? 'ҮНЭН' : 'ХУДАЛ'}`;
+    if (mode === 'or') seen.add((rain ? 1 : 0) + '' + (snow ? 1 : 0));
+    $('orTable').innerHTML = [[0, 0], [0, 1], [1, 0], [1, 1]].map(([a, b]) => {
+      const res = mode === 'or' ? (a || b) : (a && b);
+      const cur = (+rain === a && +snow === b), sn = seen.has(a + '' + b) && mode === 'or';
+      return `<tr class="${cur ? 'cur' : ''} ${sn ? 'seen' : ''}"><td>${a ? 'T' : 'F'}</td><td>${b ? 'T' : 'F'}</td><td>${res ? 'T' : 'F'}</td></tr>`;
+    }).join('');
+    $('orSeen').textContent = mode === 'or' ? `Үзсэн нөхцөл: ${seen.size}/4. Бүх 4 хослолыг туршаарай.` : 'AND дээр хоёулаа үнэн байж байж үнэн болохыг OR-той харьцуул.';
+    if (seen.size === 4) act();
+  }
+  $('swRain').onclick = () => { rain = !rain; draw(); };
+  $('swSnow').onclick = () => { snow = !snow; draw(); };
+  const m = $('orMode');
+  [['or', 'or'], ['and', 'and']].forEach(([v, t]) => { const b = document.createElement('button'); b.textContent = t; if (v === mode) b.classList.add('active'); b.onclick = () => { mode = v; m.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); draw(); }; m.appendChild(b); });
+  draw();
+}},
+
+{ id: 'flow', t: 'Flowgorithm', build: () => shell({
+  title: 'Flowgorithm',
+  text: `<p>Flowgorithm нь кодын логикийг flowchart-аар харахад тусалдаг.</p>`,
+  activity: `<div class="ctrl"><label class="field">Нас
+      <input type="number" id="flowAge" min="0" max="120" value="20"></label>
+      <button class="btn primary" id="flowRun">Ажиллуулах</button></div>
+    <svg class="flowsvg" viewBox="0 0 520 430" id="flowSvg" role="img" aria-label="Flowchart">
+      <g class="fe" id="e1"><path d="M260 50V78"/></g>
+      <g class="fe" id="e2"><path d="M260 120V150"/></g>
+      <g class="fe" id="e3"><path d="M160 200H110V290"/></g>
+      <g class="fe" id="e4"><path d="M360 200H410V290"/></g>
+      <g class="fe" id="e5"><path d="M110 334V400H200"/></g>
+      <g class="fe" id="e6"><path d="M410 334V400H320"/></g>
+      <text class="ft" x="120" y="188">тийм</text><text class="ft" x="372" y="188">үгүй</text>
+      <g class="fn" id="f-start"><rect x="200" y="10" width="120" height="40" rx="20"/><text x="260" y="30">START</text></g>
+      <g class="fn" id="f-in"><polygon points="215,80 335,80 315,120 195,120"/><text x="260" y="100">INPUT age</text></g>
+      <g class="fn" id="f-dec"><polygon points="260,150 360,200 260,250 160,200"/><text x="260" y="200">age &gt;= 18 ?</text></g>
+      <g class="fn" id="f-yes"><rect x="40" y="290" width="140" height="44"/><text x="110" y="312">Насанд хүрсэн</text></g>
+      <g class="fn" id="f-no"><rect x="340" y="290" width="140" height="44"/><text x="410" y="312">Хүүхэд</text></g>
+      <g class="fn" id="f-end"><rect x="200" y="380" width="120" height="40" rx="20"/><text x="260" y="400">END</text></g>
+    </svg>
+    <div class="fb" id="flowFb"></div>`,
+  quiz: quizHtml('Flowgorithm-д нөхцөл шалгахыг ямар дүрсээр зурдаг вэ?', ['Тэгш өнцөгт', 'Ромб', 'Зууван'], 1, 'Ромб нь «тийм / үгүй» гэж хоёр замд салгадаг.'),
+  svg: SVG.nFlow, cap: 'Flowchart-ын үндсэн дүрсүүд: зууван (эхлэл, төгсгөл), параллелограмм (оролт), ромб (шалгалт), тэгш өнцөгт (үйлдэл).'
+}), init: () => {
+  let running = false;
+  const all = ['f-start', 'f-in', 'f-dec', 'f-yes', 'f-no', 'f-end', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6'];
+  $('flowRun').onclick = async () => {
+    if (running) return; running = true;
+    all.forEach(i => $(i).classList.remove('on')); $('flowFb').textContent = '';
+    const age = +$('flowAge').value, ok = age >= 18;
+    const path = ['f-start', 'e1', 'f-in', 'e2', 'f-dec', ok ? 'e3' : 'e4', ok ? 'f-yes' : 'f-no', ok ? 'e5' : 'e6', 'f-end'];
+    for (const id of path) { $(id).classList.add('on'); await sleep(380); }
+    const fb = $('flowFb'); fb.className = 'fb good';
+    fb.textContent = `${age} >= 18 нь ${ok ? 'үнэн' : 'худал'} тул «${ok ? 'Насанд хүрсэн' : 'Хүүхэд'}» гарлаа. Өөр насаар дахин оролд.`;
+    act(); running = false;
+  };
+}}
+],
+
+11: [
+{ id: 'intro', t: 'Эхлэл', build: () => shell({
+  title: 'Эхлэл',
+  text: `<p>Python дээр нэг үйлдлийг олон удаа хийх шаардлагатай үед loop ашигладаг.</p><p>Ингэснээр нэг мөр кодыг дахин дахин бичих шаардлагагүй болно.</p>`,
+  activity: `<div class="ctrl"><label class="field">Хэдэн удаа: <span class="val" id="nVal">5</span><input type="range" id="nRange" min="1" max="12" value="5"></label>
+    <button class="btn primary" id="nRun">Ажиллуулах</button></div>
+    <pre class="code" id="nCode"></pre><div class="console" id="nOut"><div class="none">Ажиллуулах товчийг дар.</div></div>`,
+  quiz: quizHtml('for i in range(3):\n    print("Сайн уу")\n\nХэдэн удаа хэвлэгдэх вэ?', ['1 удаа', '3 удаа', '4 удаа'], 1, 'range(3) нь 0, 1, 2 гэсэн гурван утга өгдөг.'),
+  svg: SVG.eIntro, cap: 'Нэг кодыг 5 удаа давтана. Давталт бүрт i-ийн утга 0-ээс 4 хүртэл өөрчлөгдөнө.'
+}), init: () => {
+  let running = false;
+  const drawCode = () => { const n = +$('nRange').value; $('nVal').textContent = n; $('nCode').innerHTML = hl(`for i in range(${n}):\n    print("⭐", i)`); };
+  $('nRange').addEventListener('input', drawCode); drawCode();
+  $('nRun').onclick = async () => {
+    if (running) return; running = true;
+    const n = +$('nRange').value, out = $('nOut'); out.innerHTML = '';
+    for (let i = 0; i < n; i++) { out.insertAdjacentHTML('beforeend', `<div class="ln">› ⭐ ${i}</div>`); out.scrollTop = out.scrollHeight; await sleep(300); }
+    act(); running = false;
+  };
+}},
+
+{ id: 'for', t: 'FOR', build: () => shell({
+  title: 'FOR',
+  text: `<p>FOR нь тодорхой тооны удаа давтахад тохиромжтой. <b>range(эхлэх, зогсох, алхам)</b> гэж тохируулна. Зогсох тоо нь орохгүй гэдгийг анхаараарай.</p>`,
+  activity: `<div class="ctrl">
+      <label class="field">Эхлэх<input type="number" id="fStart" min="0" max="9" value="0"></label>
+      <label class="field">Зогсох<input type="number" id="fStop" min="1" max="12" value="5"></label>
+      <label class="field">Алхам<select id="fStep"><option>1</option><option>2</option><option>3</option></select></label>
+      <button class="btn primary" id="fRun">Ажиллуулах</button></div>
+    <pre class="code" id="fCode"></pre><div class="cells" id="fCells"></div><div class="console" id="fOut"><div class="none">Ажиллуулах товчийг дар.</div></div>`,
+  quiz: quizHtml('for i in range(1, 4):\n    print(i)\n\nЮу хэвлэгдэх вэ?', ['1 2 3', '1 2 3 4', '0 1 2 3'], 0, 'Эхлэх нь орно (1), зогсох нь орохгүй (4).'),
+  svg: SVG.eFor, cap: 'range(5) нь шат шиг 0-ээс 4 хүртэл нэг нэгээр дээш гарна. Дээд хязгаар болох 5 орохгүй.'
+}), init: () => {
+  let running = false;
+  const read = () => {
+    let s = Math.max(0, Math.min(9, +$('fStart').value || 0)), e = Math.max(1, Math.min(12, +$('fStop').value || 1)), st = +$('fStep').value;
+    const vals = []; for (let i = s; i < e; i += st) vals.push(i);
+    return { s, e, st, vals };
+  };
+  function draw() {
+    const { s, e, st, vals } = read();
+    const args = st === 1 ? (s === 0 ? `${e}` : `${s}, ${e}`) : `${s}, ${e}, ${st}`;
+    $('fCode').innerHTML = hl(`for i in range(${args}):\n    print(i)`);
+    $('fCells').innerHTML = Array.from({ length: e }, (_, i) => `<div class="cell ${vals.includes(i) ? 'hit' : ''}" data-i="${i}">${i}</div>`).join('');
+  }
+  ['fStart', 'fStop', 'fStep'].forEach(i => $(i).addEventListener('input', draw)); draw();
+  $('fRun').onclick = async () => {
+    if (running) return; running = true; draw();
+    const { vals } = read(), out = $('fOut'); out.innerHTML = '';
+    if (!vals.length) { out.innerHTML = '<div class="none">range хоосон байна, давталт нэг ч удаа ажиллахгүй.</div>'; }
+    for (const v of vals) {
+      const c = $('fCells').querySelector(`[data-i="${v}"]`); c.classList.add('cur');
+      out.insertAdjacentHTML('beforeend', `<div class="ln">› ${v}</div>`); await sleep(420);
+      c.classList.remove('cur'); c.classList.add('done');
+    }
+    act(); running = false;
+  };
+}},
+
+{ id: 'while', t: 'WHILE', build: () => shell({
+  title: 'WHILE',
+  text: `<p>WHILE нь нөхцөл үнэн хэвээр байх үед давтана. Нөхцөл худал болмогц зогсоно.</p>`,
+  activity: `<div class="ctrl"><label class="field">Хязгаар: <span class="val" id="wVal">5</span><input type="range" id="wLimit" min="1" max="10" value="5"></label>
+      <label class="check"><input type="checkbox" id="wForget"> count += 1-ийг мартъя</label></div>
+    <pre class="code" id="wCode"></pre>
+    <div class="whileGrid"><div class="counter" id="wCount">0</div><div style="flex:1;min-width:12rem"><div class="meter" id="wMeter"></div><div style="margin-top:.8rem"><span class="pill" id="wCond"></span></div></div></div>
+    <div class="row"><button class="btn" id="wStep">Нэг алхам</button><button class="btn primary" id="wRun">Дуустал ажиллуулах</button><button class="btn" id="wReset">Дахин эхлэх</button></div>
+    <div class="fb" id="wFb" aria-live="polite"></div>`,
+  quiz: quizHtml('count = 0\nwhile count < 3:\n    count += 1\n\nДавталт дуусахад count хэд байх вэ?', ['2', '3', '4'], 1, 'count 3 болмогц 3 < 3 худал болж давталт зогсоно.'),
+  svg: SVG.eWhile, cap: 'Аяга дүүрэхээс өмнө ус цутгаж байна. «Дүүрээгүй» гэсэн нөхцөл худал болмогц зогсоно.'
+}), init: () => {
+  let count = 0, finished = false, guard = 0, running = false;
+  const meter = () => { const l = +$('wLimit').value; $('wMeter').innerHTML = Array.from({ length: l }, (_, i) => `<span class="${i < count ? 'on' : ''}"></span>`).join(''); };
+  function code() {
+    const l = +$('wLimit').value, f = $('wForget').checked; $('wVal').textContent = l;
+    $('wCode').innerHTML = hl(`count = 0\nwhile count < ${l}:\n    print(count)\n` + (f ? `    # count += 1 мартсан` : `    count += 1`));
+    meter(); cond();
+  }
+  function cond() { const l = +$('wLimit').value, ok = count < l; const c = $('wCond'); c.className = 'pill ' + (ok ? 'good' : 'bad'); c.textContent = `${count} < ${l}  →  ${ok ? 'ҮНЭН' : 'ХУДАЛ'}`; }
+  function reset() { count = 0; finished = false; guard = 0; $('wCount').textContent = 0; $('wFb').textContent = ''; $('wFb').className = 'fb'; code(); }
+  function step() {
+    if (finished) return false;
+    const l = +$('wLimit').value, f = $('wForget').checked, fb = $('wFb');
+    if (count < l) {
+      if (!f) { count++; } else { guard++; }
+      const c = $('wCount'); c.textContent = count; c.classList.add('tick'); setTimeout(() => c.classList.remove('tick'), 200);
+      meter(); cond();
+      if (guard >= 6) { finished = true; fb.className = 'fb bad'; fb.textContent = 'Төгсгөлгүй давталт! count нэмэгдэхгүй тул нөхцөл үргэлж үнэн хэвээр байна. Тэмдэглэгээг арилгаад дахин үз.'; act(); return false; }
+      return true;
+    }
+    finished = true; fb.className = 'fb good'; fb.textContent = 'Нөхцөл худал боллоо, давталт дууслаа.'; act(); return false;
+  }
+  $('wStep').onclick = step;
+  $('wRun').onclick = async () => { if (running) return; running = true; while (step()) await sleep(450); if (!finished) step(); running = false; };
+  $('wReset').onclick = reset;
+  ['wLimit', 'wForget'].forEach(i => $(i).addEventListener('input', reset)); reset();
+}},
+
+{ id: 'break', t: 'BREAK', build: () => shell({
+  title: 'BREAK',
+  text: `<p>BREAK нь loop-ийг шууд зогсооно. Харин CONTINUE нь тухайн давталтын үлдсэн хэсгийг алгасаад дараагийн давталт руу орно.</p>`,
+  activity: `<div class="ctrl"><label class="field">Хэзээ ажиллах (i ==): <span class="val" id="bVal">5</span><input type="range" id="bAt" min="0" max="9" value="5"></label>
+      <div class="field">Командаа сонго<div class="seg" id="bMode"></div></div>
+      <button class="btn primary" id="bRun">Ажиллуулах</button></div>
+    <pre class="code" id="bCode"></pre><div class="cells" id="bCells"></div><div class="console" id="bOut"><div class="none">Ажиллуулах товчийг дар.</div></div>
+    <p class="hint" style="margin-top:.8rem" id="bSeen">break болон continue хоёуланг нь туршаарай.</p>`,
+  quiz: quizHtml('for i in range(5):\n    if i == 3:\n        continue\n    print(i)\n\n3 хэвлэгдэх үү?', ['Тийм', 'Үгүй'], 1, 'continue нь 3-ыг алгасаад дараагийн давталт руу орно, тиймээс 0 1 2 4 хэвлэгдэнэ.'),
+  svg: SVG.eBreak, cap: 'Дээд мөр: break хийхэд бүх давталт зогсоно. Доод мөр: continue зөвхөн нэг алхмыг алгасаад үргэлжилнэ.'
+}), init: () => {
+  let mode = 'break', running = false; const used = new Set();
+  const seg = $('bMode');
+  [['break', 'break'], ['continue', 'continue']].forEach(([v, t]) => { const b = document.createElement('button'); b.textContent = t; if (v === mode) b.classList.add('active'); b.onclick = () => { mode = v; seg.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); draw(); }; seg.appendChild(b); });
+  function draw() {
+    const at = +$('bAt').value; $('bVal').textContent = at;
+    $('bCode').innerHTML = hl(`for i in range(10):\n    if i == ${at}:\n        ${mode}\n    print(i)`);
+    $('bCells').innerHTML = Array.from({ length: 10 }, (_, i) => `<div class="cell" data-i="${i}">${i}</div>`).join('');
+  }
+  $('bAt').addEventListener('input', draw); draw();
+  $('bRun').onclick = async () => {
+    if (running) return; running = true; draw();
+    const at = +$('bAt').value, out = $('bOut'); out.innerHTML = ''; const cells = [...$('bCells').children]; let printed = 0;
+    for (let i = 0; i < 10; i++) {
+      const c = cells[i]; c.classList.add('cur'); await sleep(320); c.classList.remove('cur');
+      if (i === at) {
+        if (mode === 'break') { c.classList.add('stop'); for (let j = i + 1; j < 10; j++) cells[j].classList.add('unreached'); out.insertAdjacentHTML('beforeend', '<div class="ln">› break: давталт зогслоо</div>'); break; }
+        c.classList.add('skip'); out.insertAdjacentHTML('beforeend', '<div class="ln">› continue: энэ алхмыг алгаслаа</div>'); continue;
+      }
+      c.classList.add('done'); printed++; out.insertAdjacentHTML('beforeend', `<div class="ln">› ${i}</div>`); out.scrollTop = out.scrollHeight;
+    }
+    used.add(mode); $('bSeen').textContent = used.size === 2 ? 'Сайн байна! Хоёр командыг хоёуланг нь үзлээ.' : `Одоо ${mode === 'break' ? 'continue' : 'break'}-ийг туршаарай.`;
+    if (used.size === 2) act(); running = false;
+  };
+}}
+]
+};
+
+/* =============== navigation & progress =============== */
+let curGrade = 9, curIdx = 0, curLesson = null;
+const keyOf = (g, i, part) => `${g}-${LESSONS[g][i].id}-${part}`;
+function markDone(part) { if (!curLesson) return; state.done[keyOf(curGrade, curIdx, part)] = 1; save(); renderTabs(); refreshProgress(); }
+function gradeStats(g) { let n = 0, tot = LESSONS[g].length * 2; LESSONS[g].forEach((l, i) => { ['a', 'q'].forEach(p => { if (state.done[keyOf(g, i, p)]) n++; }); }); return { n, tot, pct: Math.round(n / tot * 100) }; }
+function refreshProgress() {
+  [9, 11].forEach(g => { const s = gradeStats(g); $('bar' + g).style.width = s.pct + '%'; $('barText' + g).textContent = s.n === 0 ? 'Дөнгөж эхэлж байна' : `${s.pct}% гүйцэтгэсэн`; });
+  if (curLesson) $('gradeProg').textContent = `Явц: ${gradeStats(curGrade).pct}%`;
+}
+function showHome() { $('lessonView').style.display = 'none'; $('homeView').style.display = 'block'; curLesson = null; refreshProgress(); window.scrollTo({ top: 0 }); }
+function openGrade(g) {
+  curGrade = g; $('homeView').style.display = 'none'; $('lessonView').style.display = 'block';
+  $('gradeSub').textContent = g === 9 ? '9-р анги: Flowgorithm, IF, OR' : '11-р анги: Python, FOR, WHILE, BREAK';
+  selectLesson(0);
+}
+function renderTabs() {
+  const t = $('tabs'); t.innerHTML = '';
+  LESSONS[curGrade].forEach((l, i) => {
+    const a = state.done[keyOf(curGrade, i, 'a')], q = state.done[keyOf(curGrade, i, 'q')];
+    const b = document.createElement('button');
+    b.className = 'tab' + (i === curIdx ? ' active' : '') + (a && q ? ' full' : (a || q ? ' half' : ''));
+    b.innerHTML = `<span class="dot"></span>${l.t}`; b.onclick = () => selectLesson(i); t.appendChild(b);
+  });
+}
+function selectLesson(i) {
+  curIdx = i; curLesson = LESSONS[curGrade][i];
+  $('lessonTitle').textContent = curLesson.t === 'Эхлэл' ? 'Өнөөдрийн хичээл' : curLesson.t + ' хичээл';
+  $('panel').innerHTML = curLesson.build();
+  if (i < LESSONS[curGrade].length - 1) {
+    $('panel').insertAdjacentHTML('beforeend', `<div class="nextrow"><button class="btn primary" id="nextBtn">Дараагийн хичээл: ${LESSONS[curGrade][i + 1].t}</button></div>`);
+    $('nextBtn').onclick = () => { selectLesson(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  }
+  bindQuiz(); curLesson.init(); renderTabs(); refreshProgress();
+}
+
+apply();
+</script>
+</body>
+</html>
